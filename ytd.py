@@ -68,6 +68,33 @@ def init_message():
 def exit_message(t):
     print("\n %s Has been downloaded" % t)
 
+def ytdl_download(ytdl_options, song_url):
+    with YoutubeDL(ytdl_options) as ytdl:
+        try:
+            song_title = get_title(song_url)
+            print("Downloading %s" % song_title)
+            ytdl.download([song_url])
+            exit_message(song_title)
+        except:
+            print('Error downloading %s' %song_title)
+            return None
+
+def validate_url(url):
+    parse = urllib.parse.urlparse(url)
+    if parse.scheme not in ['http', 'https']:
+        return False
+    if '.' not in parse.netlock:
+        return False
+    return True
+
+def validate_and_fix_url(url):
+    url = url.lower()
+    if not validate_url(url):
+        if 'www' in url:
+            url = url.replace('www.youtube.com/','https://www.youtube.com/')
+        else:
+            url = url.replace('youtube.com/','https://www.youtube.com/')
+    return url
 
 def download(song=None, folder_path=None, playlist=False, playlist_items=None, playlist_start=1, playlist_end=None):
 
@@ -86,17 +113,6 @@ def download(song=None, folder_path=None, playlist=False, playlist_items=None, p
             }]
     }
 
-    def ytdl_download(song_url):
-        with YoutubeDL(ytdl_options) as ytdl:
-            try:
-                song_title = get_title(song_url)
-                print("Downloading %s" % song_title)
-                ytdl.download([song_url])
-                exit_message(song_title)
-            except:
-                print('Error downloading %s' %song_title)
-                return None
-
     if not song:
         song = user_input('Enter the name of the song or the URL: ')
 
@@ -112,10 +128,11 @@ def download(song=None, folder_path=None, playlist=False, playlist_items=None, p
             print("There's some problem in your network")
             return None
 
-        ytdl_download(video_url)
+        ytdl_download(ytdl_options, video_url)
 
     else:
-        ytdl_download(song)
+        video_url = validate_and_fix_url(song)
+        ytdl_download(ytdl_options, video_url)
 
 def main():
     screen_clear()
