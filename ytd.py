@@ -123,43 +123,46 @@ def main():
 
     default_path = check_args(sys.argv[1:]).default
     config_default = config_settings(new_path=default_path)
-    path = check_args(sys.argv[1:], default=config_default).output
+    arguments = check_args(sys.argv[1:], default=config_default)
+
+    path = arguments.output
+
     try:
-        if check_args(sys.argv[1:]).video:
-            download(song=check_args(sys.argv[1:]).video, folder_path=path)
-        elif check_args(sys.argv[1:]).playlist:
+        if arguments.video:
+            download(song=arguments.video, folder_path=path)
+        elif arguments.playlist:
 
             #check if --playlist_items format is correct
-            if check_args(sys.argv[1:]).playlist_items:
+            if arguments.playlist_items:
                 try:
                     # the following assignment is only to check the format, after that we can turn back to a str value.
-                    playlist_items = [int(item) for item in check_args(sys.argv[1:]).playlist_items.split(',')]
-                    playlist_items = check_args(sys.argv[1:]).playlist_items
+                    playlist_items = [int(item) for item in arguments.playlist_items.split(',')]
+                    playlist_items = arguments.playlist_items
                 except ValueError:
                     print("ValueError: --playlist-items must be integers and divided by commas, e.g. -pi '1,2,4'")
             else:
                 playlist_items = None
             
             # check if --playlist-start can be converted into an integer, otherwise 1 is assigned
-            if check_args(sys.argv[1:]).playlist_start:
+            if arguments.playlist_start:
                 try:
-                    playlist_start = int(check_args(sys.argv[1:]).playlist_start)
+                    playlist_start = int(arguments.playlist_start)
                 except ValueError:
                     print('ValueError: --playlist-start must an integer')
             else:
                 playlist_start = 1
 
             # check if --playlist-start can be converted into an integer, otherwise None value is assigned
-            if check_args(sys.argv[1:]).playlist_end:
+            if arguments.playlist_end:
                 try:
-                    playlist_end = int(check_args(sys.argv[1:]).playlist_end)
+                    playlist_end = int(arguments.playlist_end)
                 except ValueError:
                     print('ValueError: --playlist-end must be an integer')
             else:
                 playlist_end = None
 
             print(playlist_items, playlist_start, playlist_end, sep='----\n', end='----\n')
-            download(song=check_args(sys.argv[1:]).playlist, folder_path=path, playlist=True,
+            download(song=arguments.playlist, folder_path=path, playlist=True,
                     playlist_items=playlist_items, playlist_start=playlist_start, playlist_end=playlist_end)
         else:
             while True:
